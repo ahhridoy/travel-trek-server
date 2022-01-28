@@ -3,13 +3,15 @@ const { MongoClient } = require("mongodb");
 const ObjectId = require("mongodb").ObjectId;
 const cors = require("cors");
 const app = express();
+const fileUpload = require("express-fileupload");
 require("dotenv").config();
 
 // middleware
 app.use(cors());
 app.use(express.json());
+app.use(fileUpload());
 
-const port = 5000;
+const port = process.env.PORT || 5000;
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.s1xse.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, {
@@ -54,12 +56,20 @@ async function run() {
             res.send(blogs);
         });
 
-        // admin can post blogs
+        // user can post blogs
         app.post("/blogs", async (req, res) => {
             const blogs = req.body;
             const result = await blogsCollection.insertOne(blogs);
             res.json(result);
         });
+
+        // admin can approve blog
+        // app.get("/blogs/:email", async (req, res) => {
+        //     const result = await blogsCollection
+        //         .find({ email: req.params.email })
+        //         .toArray();
+        //     res.send(result);
+        // });
 
         // admin can delete blogs
         app.delete("/blogs/:id", async (req, res) => {
