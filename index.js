@@ -25,7 +25,7 @@ async function run() {
         const blogsCollection = database.collection("blogs");
         const usersCollection = database.collection("users");
 
-        // get all products
+        // get all blogs
         app.get("/blogs", async (req, res) => {
             const cursor = blogsCollection.find({});
             const page = req.query.page;
@@ -46,12 +46,27 @@ async function run() {
             });
         });
 
-        // get one product
+        // get one blog
         app.get("/blogDetails/:id", async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
             const blogs = await blogsCollection.findOne(query);
             res.send(blogs);
+        });
+
+        // admin can post blogs
+        app.post("/blogs", async (req, res) => {
+            const blogs = req.body;
+            const result = await blogsCollection.insertOne(blogs);
+            res.json(result);
+        });
+
+        // admin can delete blogs
+        app.delete("/blogs/:id", async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await blogsCollection.deleteOne(query);
+            res.json(result);
         });
 
         // post users information
